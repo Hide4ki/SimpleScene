@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include "matrixCD.h"
+#include "Dib.h"
 
 #define M 4
 

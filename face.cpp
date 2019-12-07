@@ -1,6 +1,8 @@
 #include "face.h"
 #define round(x) floor((x)+0.5)
 
+extern Dib bmp;
+
 face::face()
 {
 }
@@ -113,7 +115,7 @@ void face::fill(map<int,vector<int>> &a, COLORREF color)const
 		sort(i->second.begin(),i->second.end()); 
 		for(int j = 0; j<i->second.size()-1; j++)
 			for(int k = i->second[j]; k < i->second[j+1]; k++)
-				SetPixel(device, k, i->first, color);
+				bmp.SetPixel(k, i->first, color);
 	}
 }
 

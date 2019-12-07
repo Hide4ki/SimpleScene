@@ -41,8 +41,8 @@ figure::figure(point *p)
 	f5[1] = point(p[6]);
 	f5[2] = point(p[7]);
 	f5[3] = point(p[3]);
-	body[0] = face(f0, RED, device);
-	body[1] = face(f1, WHITE, device);
+	body[0] = face(f0, WHITE, device);
+	body[1] = face(f1, RED, device);
 	body[2] = face(f2, BLUE, device);
 	body[3] = face(f3, YELLOW, device);
 	body[4] = face(f4, GREEN, device);

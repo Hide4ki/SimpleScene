@@ -12,7 +12,7 @@ Window::Window(LPCSTR windowName, HINSTANCE hInst, int cmdShow, LRESULT(WINAPI*p
 	_wc.hInstance = hInst;
 	_wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 	_wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	_wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+	_wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
 	_wc.lpszMenuName = menuName;
 	_wc.lpszClassName = szClassName;
 	_wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
