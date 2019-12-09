@@ -1,5 +1,7 @@
 #pragma once
+#define byte win_byte_override
 #include <Windows.h>
+#undef byte
 #include "string.h"
 
 class Window

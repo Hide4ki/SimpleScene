@@ -1,4 +1,4 @@
-#include "string.h"
+#include "String.h"
 
 char *myStrcat(char *s1, const char *s2)
 {

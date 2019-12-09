@@ -1,141 +1,138 @@
-#include "face.h"
-#define round(x) floor((x)+0.5)
+#include "Face.h"
 
-extern Dib bmp;
-
-face::face()
+Face::Face(View &canvas, Viewer &camera, int cnt, COLORREF color) : _canvas{ canvas }, _color{ color }, _vertex{ cnt }, _cntVertex{ cnt }, _camera{ camera }, _2Dvertex{ cnt }
 {
+	real = true;
 }
 
-face::face(point *p, COLORREF c,HDC d)
+Face::Face(const Face &copyFace):_vertex { copyFace._vertex }, _camera{ copyFace._camera }, _canvas { copyFace._canvas }, _2Dvertex{ copyFace._2Dvertex }
 {
-	device = d;
-	body = new matrixCD(p);
-	color = c;
+	_cntVertex = copyFace._cntVertex;
+	_midZ = copyFace._midZ;
+	_color = copyFace._color; 
+	real = copyFace.real;
 }
 
-face::face(const face &myFace)
+Face::Face(Face &&moveFace) :_vertex{ move(moveFace._vertex) }, _camera{ moveFace._camera }, _canvas{ moveFace._canvas }, _2Dvertex{ move(moveFace._2Dvertex) }
 {
-	device = myFace.device;
-	body = new matrixCD(*myFace.body);
-	color = myFace.color;
+	_cntVertex = moveFace._cntVertex;
+	_midZ = moveFace._midZ;
+	_color = moveFace._color;
+	real = moveFace.real;
 }
 
-void face::operator = (face &myFace)
+void Face::Fill(map<int, vector<int>>& a, COLORREF color) const
 {
-	device = myFace.device;
-	body = new matrixCD(*myFace.body);
-	color = myFace.color;
-}
-
-face::~face()
-{
-	delete body;
-}
-	
-void generate2Dpoint(matrixCD *_3D, point *_2D)
-{
-	//X = x*(zc - zpl)/(zc-z);
-	//Y = y*(zc - zpl)/(zc-z);
-	//Z = z-zpl;
-	static const double zc = -1000.0;//z camera;
-	static const double zpl = -50.0;//z plane;
-	for(int i = 0; i<M; i++)
-	{	
-		double k = (zc - (*_3D)(i,2));
-		k = (k==0)? -1 : k;
-		_2D[i] = point((*_3D)(i,0)*(zc - zpl)/k, (*_3D)(i,1)*(zc - zpl)/k,(*_3D)(i,2) - zpl);
+	for (auto i = a.begin(); i != a.end(); i++)
+	{
+		sort(i->second.begin(), i->second.end());
+		for (unsigned int j = 0; j < i->second.size() - 1; j++)
+			for (int k = i->second[j]; k < i->second[j + 1]; k++)
+				_canvas.SetPixel(k, i->first, color);
 	}
 }
 
-void face::display()const
+void Face::Draw(COLORREF color)
 {
-	point _2D[M];
-	generate2Dpoint(body,_2D);
-	if(visible(_2D))
-		draw(_2D, color);
-}
-
-bool face::visible(point *_2D)const
-{
-	double sum = 0;
-	int j;	
-	for (int i = 0; i < M; i++)
+	Generate2D();
+	map<int, vector<int>> points;
+	int x1, x2, y1, y2, dx, dy, err, e2, sx, sy;
+	for (int i = 0; i < _cntVertex; i++)
 	{
-		j = i == M-1 ? 0 : i + 1;
-		sum += (_2D[i].getx() - _2D[j].getx())*(_2D[i].gety() + _2D[j].gety());
-	}
-	return sum > 0;
-}
-
-void face::remove()const
-{
-	point _2D[M];
-	generate2Dpoint(body,_2D);
-	if(visible(_2D))
-		draw(_2D, 0x000000);
-}
-
-void face::draw(point *_2D, COLORREF color)const
-{
-	map<int,vector<int>> a;
-	int x0,x1,y0,y1,dx,dy,err,e2,sx,sy;
-	for (int i = 0; i < M; i++)
-	{
-		x0 = round(_2D[i].getx());
-		x1 = round(_2D[(i + 1 == M) ? 0: i + 1].getx());
-		y0 = round(_2D[i].gety());
-		y1 = round(_2D[(i + 1 == M) ? 0: i + 1].gety());
-		dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
-		dy = abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+		auto i2 = (i + 1 == _cntVertex) ? 0 : i + 1;
+		x1 = round(_2Dvertex(i, 0)/ _2Dvertex(i, 3));
+		x2 = round(_2Dvertex(i2, 0) / _2Dvertex(i2, 3));
+		y1 = round(_2Dvertex(i, 1) / _2Dvertex(i, 3));
+		y2 = round(_2Dvertex(i2, 1) / _2Dvertex(i2, 3));
+		dx = abs(x2 - x1), sx = x1 < x2 ? 1 : -1;
+		dy = abs(y2 - y1), sy = y1 < y2 ? 1 : -1;
 		err = (dx > dy ? dx : -dy) / 2;
 		e2 = err;
 		for (;;)
 		{
-			if(a.count(y0) == 0)
-				a.insert(pair<int, vector<int>>(y0,vector<int>(0)));
-			a.find(y0)->second.push_back(x0);
-			bmp.SetPixel(x0, y0, color);
-			if (x0 == x1 && y0 == y1) 
+			if (points.count(y1) == 0)
+				points.insert(pair<int, vector<int>>(y1, vector<int>(0)));
+			points.find(y1)->second.push_back(x1);
+			_canvas.SetPixel(x1, y1, color);
+			if (x1 == x2 && y1 == y2)
 				break;
 			e2 = err;
 			if (e2 > -dx)
-				err -= dy, x0 += sx;
+				err -= dy, x1 += sx;
 			if (e2 < dy)
-				err += dx, y0 += sy;
+				err += dx, y1 += sy;
 		}
 	}
-	fill(a, color);
-}	
+	Fill(points, color);
+}
 
-void face::fill(map<int,vector<int>> &a, COLORREF color)const
-{
-	for(auto i = a.begin(); i!=a.end(); i++)
+void Face::Generate2D()
+{	
+	//X = x*(zc - zpl)/(zc-z);
+	//Y = y*(zc - zpl)/(zc-z);
+	//Z = z-zpl;
+
+
+    for (int i = 0; i<_cntVertex; i++)
 	{
-		sort(i->second.begin(),i->second.end()); 
-		for(int j = 0; j<i->second.size()-1; j++)
-			for(int k = i->second[j]; k < i->second[j+1]; k++)
-				bmp.SetPixel(k, i->first, color);
+		double k = (_camera.GetZ() - _vertex(i, 2));
+		k = (k == 0) ? -1 : k;
+		_2Dvertex(i, 0) = _vertex(i, 0)*(_camera.GetZ() - 50) / k;
+		_2Dvertex(i, 1) = _vertex(i, 1)*(_camera.GetZ() - 50) / k;
+		_2Dvertex(i, 2) = _vertex(i, 2) - 50;
 	}
 }
 
-point face::centre(void)const
+CoordinatMatrix Face::Centre()
 {
-	point tmp;
-	for(int i=0; i<M; i++)
-		tmp += point((*body)(i,0),(*body)(i,1),(*body)(i,2));
-	tmp/=M;
+	CoordinatMatrix tmp{1};
+	for (int i = 0; i < _cntVertex; i++)
+	{
+		tmp(0, 0) += _vertex(i, 0);
+		tmp(0, 1) += _vertex(i, 1);
+		tmp(0, 2) += _vertex(i, 2);
+	}
+	tmp(0, 0) /= _cntVertex;
+	tmp(0, 1) /= _cntVertex;
+	tmp(0, 2) /= _cntVertex;
 	return tmp;
 }
 
-void face::move(matrixMOV &mov)
+double Face::GetMidZ()
 {
-	*body*=mov;
+	return _midZ;
 }
 
-void face::scale(matrixSCALE &scale, matrixMOV &to, matrixMOV &from)
+void Face::Draw()
 {
-	*body*=to;
-	*body*=scale;
-	*body*=from;
+	Draw(_color);
+}
+
+void Face::Clear()
+{
+	Draw(0);
+}
+
+void Face::SetColor(COLORREF color)
+{
+	_color = color;
+}
+
+void Face::CalculMidZ()
+{
+	_midZ = (_vertex(0, 2) + _vertex(1, 2) + _vertex(2, 2) + _vertex(3, 2)) / _cntVertex;
+}
+
+Face Face::operator()(TransformMatrix &tr)
+{
+	Face tmp{ *this };
+	tmp._vertex *= tr;
+	tmp._color = RGB(170, 70, 70);
+	tmp.real = false;
+	return tmp;
+}
+
+CoordinatMatrix * Face::GetSetCoordinats()
+{
+	return &_vertex;
 }
