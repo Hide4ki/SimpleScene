@@ -3,16 +3,6 @@
 
 using namespace std;
 
-//Параллелепипед и
-//куб
-//Построчное
-//заполнение
-//Алгоритм
-//«художника»
-//Построение
-//«на землю»
-//(источник света на конечном расстоянии)
-
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){

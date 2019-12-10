@@ -43,9 +43,9 @@ COLORREF View::GetPixel(int y, int x)
 	int blue = 0, green = 0, red = 0;
 	if (row < _height  && row > 0 && col > 0 && col < _bytesPerLine)
 	{
-		blue = _aBitmapBits[row*_bytesPerLine + col];
+		blue  = _aBitmapBits[row*_bytesPerLine + col];
 		green = _aBitmapBits[row*_bytesPerLine + col + 1];
-		red = _aBitmapBits[row*_bytesPerLine + col + 2];
+		red   = _aBitmapBits[row*_bytesPerLine + col + 2];
 	}
 	return RGB(red, green, blue);
 }

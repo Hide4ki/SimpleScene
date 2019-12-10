@@ -1,7 +1,5 @@
 #include "Model.h"
 
-const double size_room = 100;
-
 int Model::GenerateId()
 {
 	static int id = 0;
@@ -89,40 +87,19 @@ void Model::Draw()
 		for (auto j : f)
 		{
 			faces.push_back(j);
-			TransformMatrix shadow;
-			auto l = _lightSource.GetPlace();
-			shadow(0, 0) = -l(0, 2);
-			shadow(0, 1) = l(0, 1);
-			shadow(1, 0) = l(0, 0);
-			shadow(1, 1) = -l(0, 2);
-			shadow(2, 2) = 0;
-			shadow(2, 3) = 1;
-			shadow(3, 3) = -l(0, 2);
-			Face *tmp = new Face{ (*j)(shadow) };
-			auto tmp2 = tmp->GetSetCoordinats();
-			(*tmp2)(0, 0) /= (*tmp2)(0, 3);
-			(*tmp2)(0, 1) /= (*tmp2)(0, 3);
-			(*tmp2)(0, 2) /= (*tmp2)(0, 3);
-			(*tmp2)(0, 3) /= (*tmp2)(0, 3);
-			(*tmp2)(1, 0) /= (*tmp2)(1, 3);
-			(*tmp2)(1, 1) /= (*tmp2)(1, 3);
-			(*tmp2)(1, 2) /= (*tmp2)(1, 3);
-			(*tmp2)(1, 3) /= (*tmp2)(1, 3);
-			(*tmp2)(2, 0) /= (*tmp2)(2, 3);
-			(*tmp2)(2, 1) /= (*tmp2)(2, 3);
-			(*tmp2)(2, 2) /= (*tmp2)(2, 3);
-			(*tmp2)(2, 3) /= (*tmp2)(2, 3);
-			(*tmp2)(3, 0) /= (*tmp2)(3, 3);
-			(*tmp2)(3, 1) /= (*tmp2)(3, 3);
-			(*tmp2)(3, 2) /= (*tmp2)(3, 3);
-			(*tmp2)(3, 3) /= (*tmp2)(3, 3);
-			tmp->CalculMidZ();
-			faces.push_back(tmp);
+			faces.push_back(j->Shadow(_lightSource));
 		}
 	}
+
 	sort(faces.begin(), faces.end(), [](Face *l, Face *r) { return l->GetMidZ() < r->GetMidZ(); });
+	
 	for (auto r : faces)
 		r->Draw();
+
+	for (auto i : faces)
+		if (!i->Real())
+			delete i;
+
 	UpdateView();
 }
 
@@ -135,41 +112,15 @@ void Model::Clear()
 		for (auto j : f)
 		{
 			faces.push_back(j);
-			TransformMatrix shadow;
-			auto l = _lightSource.GetPlace();
-			shadow(0, 0) = -l(0, 2);
-			shadow(0, 1) = l(0, 1);
-			shadow(1, 0) = l(0, 0);
-			shadow(1, 1) = -l(0, 2);
-			shadow(2, 2) = 0;
-			shadow(2, 3) = 1;
-			shadow(3, 3) = -l(0, 2);
-			Face *tmp = new Face{ (*j)(shadow) };
-			auto tmp2 = tmp->GetSetCoordinats();
-			(*tmp2)(0, 0) /= (*tmp2)(0, 3);
-			(*tmp2)(0, 1) /= (*tmp2)(0, 3);
-			(*tmp2)(0, 2) /= (*tmp2)(0, 3);
-			(*tmp2)(0, 3) /= (*tmp2)(0, 3);
-			(*tmp2)(1, 0) /= (*tmp2)(1, 3);
-			(*tmp2)(1, 1) /= (*tmp2)(1, 3);
-			(*tmp2)(1, 2) /= (*tmp2)(1, 3);
-			(*tmp2)(1, 3) /= (*tmp2)(1, 3);
-			(*tmp2)(2, 0) /= (*tmp2)(2, 3);
-			(*tmp2)(2, 1) /= (*tmp2)(2, 3);
-			(*tmp2)(2, 2) /= (*tmp2)(2, 3);
-			(*tmp2)(2, 3) /= (*tmp2)(2, 3);
-			(*tmp2)(3, 0) /= (*tmp2)(3, 3);
-			(*tmp2)(3, 1) /= (*tmp2)(3, 3);
-			(*tmp2)(3, 2) /= (*tmp2)(3, 3);
-			(*tmp2)(3, 3) /= (*tmp2)(3, 3);
-			tmp->CalculMidZ();
-			faces.push_back(tmp);
+			faces.push_back(j->Shadow(_lightSource));
 		}
 	}
+
 	for (auto r : faces)
 		r->Clear();
+	
 	for (auto i : faces)
-		if (!i->GetR())
+		if (!i->Real())
 			delete i;
 
 }
@@ -179,17 +130,7 @@ void Model::UpdateView()
 	_canvas._update = true;
 }
 
-Model::Model(View &canvas, LightSource &light) :_canvas{ canvas }, _lightSource{ light }, _room
-{
-	{ 0, 0, 0, 1 }
-	,{ 0, 0, size_room, 1 }
-	,{ 0, size_room, 0, 1 }
-	,{ 0, size_room, size_room, 1 }
-	,{ size_room, 0, 0, 1 }
-	,{ size_room, 0, size_room, 1 }
-	,{ size_room, size_room, 0, 1 }
-	,{ size_room, size_room, size_room, 1 }
-}
+Model::Model(View &canvas, LightSource &light) :_canvas{ canvas }, _lightSource{ light }
 {
 }
 

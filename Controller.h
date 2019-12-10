@@ -19,20 +19,19 @@ public:
 	~Controller();
 	LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 private:
-	HDC hDC;
-	HWND hWinLightX;
-	HWND hWinLightY;
-	HWND hWinLightZ;
-	HWND SetLIGHT;
-	int lightX;
-	PAINTSTRUCT ps;
-	RECT rect;
-	int x, y;
-	int ws, hs, wd, hd;
-	int dX, dY;
-	Model *model;
-	View *view;
-	Viewer *camera;
-	LightSource *light;
+	HDC _hDC;
+	HWND _hWinLightX;
+	HWND _hWinLightY;
+	HWND _hWinLightZ;
+	HWND _setLIGHT;
+	int _lightX;
+	PAINTSTRUCT _ps;
+	RECT _rect;
+	int _ws, _hs, _wd, _hd;
+	int _dX, _dY;
+	Model *_model;
+	View *_view;
+	Viewer *_camera;
+	LightSource *_light;
 };
 

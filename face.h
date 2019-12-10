@@ -9,6 +9,7 @@
 #include "Viewer.h"
 #include "View.h"
 #include "Color.h"
+#include "LightSource.h"
 
 class View;
 class Object;
@@ -31,13 +32,13 @@ public:
 	void Clear();
 	void SetColor(COLORREF);
 	void CalculMidZ();
-	Face operator()(TransformMatrix&);
+	Face *Shadow(LightSource&);
 	CoordinatMatrix *GetSetCoordinats();
-	bool GetR() { return real; };
+	bool Real();
 private:
 	CoordinatMatrix _vertex;
 	CoordinatMatrix _2Dvertex;
-	bool real;
+	bool _real;
 	int _cntVertex;
 	double _midZ;
 	COLORREF _color;

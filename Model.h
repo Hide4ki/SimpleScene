@@ -35,7 +35,6 @@ public:
 private:
 	vector<Object*> _items;
 	LightSource &_lightSource;
-	double _room[8][4];
 	View &_canvas;
 };
 
