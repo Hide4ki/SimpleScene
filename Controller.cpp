@@ -2,10 +2,10 @@
 
 Controller::Controller()
 {
-	light = new LightSource(-600.0, -600.0, 4000.0);
+	light = new LightSource(100.0, 100.0, 600.0);
 	view = new View(640, 480);
 	model = new Model(*view, *light);
-	camera = new Viewer(-1000);
+	camera = new Viewer(1000);
 	PointMatrix *tmp1 = new PointMatrix[8];
 	tmp1[0](0, 0) = 200.0; tmp1[0](0, 1) = 100.0; tmp1[0](0, 2) = 150.0;
 	tmp1[1](0, 0) = 250.0; tmp1[1](0, 1) = 100.0; tmp1[1](0, 2) = 150.0;
@@ -46,21 +46,219 @@ LRESULT CALLBACK Controller::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 	switch (uMsg)
 	{
 	case WM_CREATE:
+	{
+		int yBotton = 0;
+		int wBotton = 220;
+		int hBotton = 17;
+		int xBotton1 = 640;
+		int xBotton2 = 640 + wBotton;
 		hDC = GetDC(hWnd);
 		GetClientRect(hWnd, &rect);
-		dX = view->GetWidth() - rect.right;
-		dY = view->GetHeight() - rect.bottom;
+		dX = view->GetWidth() - rect.right + 2*wBotton;
+		dY = view->GetHeight() - rect.bottom + hBotton;
 		GetWindowRect(hWnd, &rect);
 		InflateRect(&rect, dX / 2, dY / 2);
 		MoveWindow(hWnd, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, TRUE);
+		hWinLightX = CreateWindow("Edit", "", WS_VISIBLE | WS_CHILD | WS_BORDER, 0, 480, 50, 15, hWnd, NULL, NULL, NULL);
+		hWinLightY = CreateWindow("Edit", "", WS_VISIBLE | WS_CHILD | WS_BORDER, 50, 480, 50, 15, hWnd, NULL, NULL, NULL);
+		hWinLightZ = CreateWindow("Edit", "", WS_VISIBLE | WS_CHILD | WS_BORDER, 100, 480, 50, 15, hWnd, NULL, NULL, NULL);
+		CreateWindow("Button", "Set place light source", WS_VISIBLE | WS_CHILD, 150, 480, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::CHANGE_LS), NULL, NULL);
+		CreateWindow("Button", "Move cube right", WS_VISIBLE | WS_CHILD, xBotton1, yBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::MOVE_R1), NULL, NULL);
+		CreateWindow("Button", "Move cube left", WS_VISIBLE | WS_CHILD, xBotton2, yBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::MOVE_L1), NULL, NULL);
+		CreateWindow("Button", "Move cube forward", WS_VISIBLE | WS_CHILD, xBotton1, yBotton += hBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::MOVE_F1), NULL, NULL);
+		CreateWindow("Button", "Move cube back", WS_VISIBLE | WS_CHILD, xBotton2, yBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::MOVE_B1), NULL, NULL);
+		CreateWindow("Button", "Move cube up", WS_VISIBLE | WS_CHILD, xBotton1, yBotton += hBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::MOVE_U1), NULL, NULL);
+		CreateWindow("Button", "Move cube down", WS_VISIBLE | WS_CHILD, xBotton2, yBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::MOVE_D1), NULL, NULL);
+		CreateWindow("Button", "Rotate cube clock wise oX", WS_VISIBLE | WS_CHILD, xBotton1, yBotton += hBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::ROTATE_CW_X1), NULL, NULL);
+		CreateWindow("Button", "Rotate cube no clock wise oX", WS_VISIBLE | WS_CHILD, xBotton2, yBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::ROTATE_ACW_X1), NULL, NULL);
+		CreateWindow("Button", "Rotate cube clock wise oY", WS_VISIBLE | WS_CHILD, xBotton1, yBotton += hBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::ROTATE_CW_Y1), NULL, NULL);
+		CreateWindow("Button", "Rotate cube no clock wise oY", WS_VISIBLE | WS_CHILD, xBotton2, yBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::ROTATE_ACW_Y1), NULL, NULL);
+		CreateWindow("Button", "Rotate cube clock wise oZ", WS_VISIBLE | WS_CHILD, xBotton1, yBotton += hBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::ROTATE_CW_Z1), NULL, NULL);
+		CreateWindow("Button", "Rotate cube no clock wise oZ", WS_VISIBLE | WS_CHILD, xBotton2, yBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::ROTATE_ACW_Z1), NULL, NULL);
+		CreateWindow("Button", "Scale cube X2", WS_VISIBLE | WS_CHILD, xBotton1, yBotton += hBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::SCALE1M), NULL, NULL);
+		CreateWindow("Button", "Scale cube X0.5", WS_VISIBLE | WS_CHILD, xBotton2, yBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::SCALE1L), NULL, NULL);
+		CreateWindow("Button", "Move para right", WS_VISIBLE | WS_CHILD, xBotton1, yBotton += hBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::MOVE_R2), NULL, NULL);
+		CreateWindow("Button", "Move para left", WS_VISIBLE | WS_CHILD, xBotton2, yBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::MOVE_L2), NULL, NULL);
+		CreateWindow("Button", "Move para forward", WS_VISIBLE | WS_CHILD, xBotton1, yBotton += hBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::MOVE_F2), NULL, NULL);
+		CreateWindow("Button", "Move para back", WS_VISIBLE | WS_CHILD, xBotton2, yBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::MOVE_B2), NULL, NULL);
+		CreateWindow("Button", "Move para up", WS_VISIBLE | WS_CHILD, xBotton1, yBotton += hBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::MOVE_U2), NULL, NULL);
+		CreateWindow("Button", "Move para down", WS_VISIBLE | WS_CHILD, xBotton2, yBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::MOVE_D2), NULL, NULL);
+		CreateWindow("Button", "Rotate para clock wise oX", WS_VISIBLE | WS_CHILD, xBotton1, yBotton += hBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::ROTATE_CW_X2), NULL, NULL);
+		CreateWindow("Button", "Rotate para no clock wise oX", WS_VISIBLE | WS_CHILD, xBotton2, yBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::ROTATE_ACW_X2), NULL, NULL);
+		CreateWindow("Button", "Rotate para clock wise oY", WS_VISIBLE | WS_CHILD, xBotton1, yBotton += hBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::ROTATE_CW_Y2), NULL, NULL);
+		CreateWindow("Button", "Rotate para no clock wise oY", WS_VISIBLE | WS_CHILD, xBotton2, yBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::ROTATE_ACW_Y2), NULL, NULL);
+		CreateWindow("Button", "Rotate para clock wise oZ", WS_VISIBLE | WS_CHILD, xBotton1, yBotton += hBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::ROTATE_CW_Z2), NULL, NULL);
+		CreateWindow("Button", "Rotate para no clock wise oZ", WS_VISIBLE | WS_CHILD, xBotton2, yBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::ROTATE_ACW_Z2), NULL, NULL);
+		CreateWindow("Button", "Scale para X2", WS_VISIBLE | WS_CHILD, xBotton1, yBotton += hBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::SCALE2M), NULL, NULL);
+		CreateWindow("Button", "Scale para X0.5", WS_VISIBLE | WS_CHILD, xBotton2, yBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::SCALE2L), NULL, NULL);
+		CreateWindow("Button", "Move scene right", WS_VISIBLE | WS_CHILD, xBotton1, yBotton += hBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::MOVE_R0), NULL, NULL);
+		CreateWindow("Button", "Move scene left", WS_VISIBLE | WS_CHILD, xBotton2, yBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::MOVE_L0), NULL, NULL);
+		CreateWindow("Button", "Move scene forward", WS_VISIBLE | WS_CHILD, xBotton1, yBotton += hBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::MOVE_F0), NULL, NULL);
+		CreateWindow("Button", "Move scene back", WS_VISIBLE | WS_CHILD, xBotton2, yBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::MOVE_B0), NULL, NULL);
+		CreateWindow("Button", "Move scene up", WS_VISIBLE | WS_CHILD, xBotton1, yBotton += hBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::MOVE_U0), NULL, NULL);
+		CreateWindow("Button", "Move scene down", WS_VISIBLE | WS_CHILD, xBotton2, yBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::MOVE_D0), NULL, NULL);
+		CreateWindow("Button", "Rotate scene clock wise oX", WS_VISIBLE | WS_CHILD, xBotton1, yBotton += hBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::ROTATE_CW_X0), NULL, NULL);
+		CreateWindow("Button", "Rotate scene no clock wise oX", WS_VISIBLE | WS_CHILD, xBotton2, yBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::ROTATE_ACW_X0), NULL, NULL);
+		CreateWindow("Button", "Rotate scene clock wise oY", WS_VISIBLE | WS_CHILD, xBotton1, yBotton += hBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::ROTATE_CW_Y0), NULL, NULL);
+		CreateWindow("Button", "Rotate scene no clock wise oY", WS_VISIBLE | WS_CHILD, xBotton2, yBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::ROTATE_ACW_Y0), NULL, NULL);
+		CreateWindow("Button", "Rotate scene clock wise oZ", WS_VISIBLE | WS_CHILD, xBotton1, yBotton += hBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::ROTATE_CW_Z0), NULL, NULL);
+		CreateWindow("Button", "Rotate scene no clock wise oZ", WS_VISIBLE | WS_CHILD, xBotton2, yBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::ROTATE_ACW_Z0), NULL, NULL);
+		CreateWindow("Button", "Scale scene X0", WS_VISIBLE | WS_CHILD, xBotton1, yBotton += hBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::SCALE0M), NULL, NULL);
+		CreateWindow("Button", "Scale scene X0.5", WS_VISIBLE | WS_CHILD, xBotton2, yBotton, wBotton, hBotton, hWnd, (HMENU)static_cast<int>(CommandBotton::SCALE0L), NULL, NULL);
 		ReleaseDC(hWnd, hDC);
+		break;
+	}
+	case WM_COMMAND:
+		switch (wParam)
+		{
+		case static_cast<int>(CommandBotton::CHANGE_LS) :
+			{
+				char lightX[10];
+				char lightY[10];
+				char lightZ[10];
+				GetWindowText(hWinLightX, lightX, 10);
+				GetWindowText(hWinLightY, lightY, 10);
+				GetWindowText(hWinLightZ, lightZ, 10);
+				model->ChangeLightSource(atoi(lightX), atoi(lightY), atoi(lightZ));
+			}
+			SetFocus(hWnd);
+			break;
+		case static_cast<int>(CommandBotton::MOVE_B0) :
+			model->AloneChange(Transform::MOVE_B, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::MOVE_D0) :
+			model->AloneChange(Transform::MOVE_D, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::MOVE_F0) :
+			model->AloneChange(Transform::MOVE_F, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::MOVE_L0) :
+			model->AloneChange(Transform::MOVE_L, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::MOVE_R0) :
+			model->AloneChange(Transform::MOVE_R, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::MOVE_U0) :
+			model->AloneChange(Transform::MOVE_U, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::ROTATE_ACW_X0) :
+			model->AloneChange(Transform::ROTATE_ACW_X, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::ROTATE_ACW_Y0) :
+			model->AloneChange(Transform::ROTATE_ACW_Y, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::ROTATE_ACW_Z0) :
+			model->AloneChange(Transform::ROTATE_ACW_Z, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::ROTATE_CW_X0) :
+			model->AloneChange(Transform::ROTATE_CW_X, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::ROTATE_CW_Y0) :
+			model->AloneChange(Transform::ROTATE_CW_Y, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::ROTATE_CW_Z0) :
+			model->AloneChange(Transform::ROTATE_CW_Z, 10.0);		
+		case static_cast<int>(CommandBotton::SCALE0L) :
+			model->AloneChange(Transform::SCALE, 0.5);
+			break;
+		case static_cast<int>(CommandBotton::SCALE0M) :
+			model->AloneChange(Transform::SCALE, 2);
+			break;
+			break;
+		case static_cast<int>(CommandBotton::MOVE_B1) :
+			model->AloneChangeObj(1, Transform::MOVE_B, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::MOVE_D1) :
+			model->AloneChangeObj(1, Transform::MOVE_D, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::MOVE_F1) :
+			model->AloneChangeObj(1, Transform::MOVE_F, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::MOVE_L1) :
+			model->AloneChangeObj(1, Transform::MOVE_L, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::MOVE_R1) :
+			model->AloneChangeObj(1, Transform::MOVE_R, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::MOVE_U1) :
+			model->AloneChangeObj(1, Transform::MOVE_U, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::ROTATE_ACW_X1) :
+			model->AloneChangeObj(1, Transform::ROTATE_ACW_X, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::ROTATE_ACW_Y1) :
+			model->AloneChangeObj(1, Transform::ROTATE_ACW_Y, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::ROTATE_ACW_Z1) :
+			model->AloneChangeObj(1, Transform::ROTATE_ACW_Z, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::ROTATE_CW_X1) :
+			model->AloneChangeObj(1, Transform::ROTATE_CW_X, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::ROTATE_CW_Y1) :
+			model->AloneChangeObj(1, Transform::ROTATE_CW_Y, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::ROTATE_CW_Z1) :
+			model->AloneChangeObj(1, Transform::ROTATE_CW_Z, 10.0);
+			break;		
+		case static_cast<int>(CommandBotton::SCALE1L) :
+			model->AloneChangeObj(1, Transform::SCALE, 0.5);
+			break;
+		case static_cast<int>(CommandBotton::SCALE1M) :
+			model->AloneChangeObj(1, Transform::SCALE, 2);
+			break;
+		case static_cast<int>(CommandBotton::MOVE_B2) :
+			model->AloneChangeObj(2, Transform::MOVE_B, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::MOVE_D2) :
+			model->AloneChangeObj(2, Transform::MOVE_D, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::MOVE_F2) :
+			model->AloneChangeObj(2, Transform::MOVE_F, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::MOVE_L2) :
+			model->AloneChangeObj(2, Transform::MOVE_L, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::MOVE_R2) :
+			model->AloneChangeObj(2, Transform::MOVE_R, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::MOVE_U2) :
+			model->AloneChangeObj(2, Transform::MOVE_U, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::ROTATE_ACW_X2) :
+			model->AloneChangeObj(2, Transform::ROTATE_ACW_X, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::ROTATE_ACW_Y2) :
+			model->AloneChangeObj(2, Transform::ROTATE_ACW_Y, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::ROTATE_ACW_Z2) :
+			model->AloneChangeObj(2, Transform::ROTATE_ACW_Z, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::ROTATE_CW_X2) :
+			model->AloneChangeObj(2, Transform::ROTATE_CW_X, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::ROTATE_CW_Y2) :
+			model->AloneChangeObj(2, Transform::ROTATE_CW_Y, 10.0);
+			break;
+		case static_cast<int>(CommandBotton::ROTATE_CW_Z2) :
+			model->AloneChangeObj(2, Transform::ROTATE_CW_Z, 10.0);
+			break;		
+		case static_cast<int>(CommandBotton::SCALE2L) :
+			model->AloneChangeObj(2, Transform::SCALE, 0.5);
+			break;
+		case static_cast<int>(CommandBotton::SCALE2M) :
+			model->AloneChangeObj(2, Transform::SCALE, 2);
+			break;
+		}
 		break;
 	case WM_PAINT:
 		hDC = BeginPaint(hWnd, &ps);
+		GetWindowText;
 		wd = ws = view->GetWidth();
 		hd = hs = view->GetHeight();
 		view->Draw(hDC, 0, 0, wd, hd, 0, hs, ws, -hs, SRCCOPY);
 		EndPaint(hWnd, &ps);
+		SetFocus(hWnd);
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);

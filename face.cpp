@@ -72,14 +72,13 @@ void Face::Generate2D()
 	//Y = y*(zc - zpl)/(zc-z);
 	//Z = z-zpl;
 
-
+	double zpl = 400;
     for (int i = 0; i<_cntVertex; i++)
 	{
 		double k = (_camera.GetZ() - _vertex(i, 2));
-		k = (k == 0) ? -1 : k;
-		_2Dvertex(i, 0) = _vertex(i, 0)*(_camera.GetZ() - 50) / k;
-		_2Dvertex(i, 1) = _vertex(i, 1)*(_camera.GetZ() - 50) / k;
-		_2Dvertex(i, 2) = _vertex(i, 2) - 50;
+		_2Dvertex(i, 0) = _vertex(i, 0)*(_camera.GetZ() - zpl) / k;
+		_2Dvertex(i, 1) = _vertex(i, 1)*(_camera.GetZ() - zpl) / k;
+		_2Dvertex(i, 2) = _vertex(i, 2) - zpl;
 	}
 }
 
