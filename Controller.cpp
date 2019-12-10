@@ -2,7 +2,7 @@
 
 Controller::Controller()
 {
-	light = new LightSource(-600.0, -600.0, 2000.0);
+	light = new LightSource(-600.0, -600.0, 4000.0);
 	view = new View(640, 480);
 	model = new Model(*view, *light);
 	camera = new Viewer(-1000);
@@ -69,39 +69,111 @@ LRESULT CALLBACK Controller::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 		switch (wParam)
 		{
 		case 'q':
-			model->AloneChange(Transform::MOVE_B, 10.0);
+			model->AloneChangeObj(2, Transform::MOVE_B, 10.0);
 			break;
 		case 'w':
-			model->AloneChange(Transform::MOVE_U, 10.0);
+			model->AloneChangeObj(2, Transform::MOVE_U, 10.0);
 			break;
 		case 'e':
-			model->AloneChange(Transform::MOVE_F, 10.0);
+			model->AloneChangeObj(2, Transform::MOVE_F, 10.0);
 			break;
 		case 'a':
-			model->AloneChange(Transform::MOVE_L, 10.0);
+			model->AloneChangeObj(2, Transform::MOVE_L, 10.0);
 			break;
 		case 's':
-			model->AloneChange(Transform::MOVE_D, 10.0);
+			model->AloneChangeObj(2, Transform::MOVE_D, 10.0);
 			break;
 		case 'd':
-			model->AloneChange(Transform::MOVE_R, 10.0);
+			model->AloneChangeObj(2, Transform::MOVE_R, 10.0);
 			break;
 		case 'z':
-			model->AloneChange(Transform::SCALE, 0.5);
+			model->AloneChangeObj(2, Transform::SCALE, 0.5);
 			break;
 		case 'x':
-			model->AloneChange(Transform::SCALE, 2.0);
+			model->AloneChangeObj(2, Transform::SCALE, 2.0);
 			break;
-		case 'y':
+		case 'r':
+			model->AloneChangeObj(2, Transform::ROTATE_CW_X, 10.0);
+			break;
+		case 't':
+			model->AloneChangeObj(2, Transform::ROTATE_ACW_X, 10.0);
+			break;
+		case 'f':
+			model->AloneChangeObj(2, Transform::ROTATE_CW_Y, 10.0);
+			break;
+		case 'g':
+			model->AloneChangeObj(2, Transform::ROTATE_ACW_Y, 10.0);
+			break;
+		case 'v':
+			model->AloneChangeObj(2, Transform::ROTATE_CW_Z, 10.0);
+			break;
+		case 'b':
+			model->AloneChangeObj(2, Transform::ROTATE_ACW_Z, 10.0);
+			break;
+		case 'A':
+			model->AloneChangeObj(1, Transform::MOVE_L, 10.0);
+			break;
+		case 'W':
+			model->AloneChangeObj(1, Transform::MOVE_U, 10.0);
+			break;
+		case 'S':
+			model->AloneChangeObj(1, Transform::MOVE_D, 10.0);
+			break;
+		case 'Q':
+			model->AloneChangeObj(1, Transform::MOVE_B, 10.0);
+			break;
+		case 'E':
+			model->AloneChangeObj(1, Transform::MOVE_F, 10.0);
+			break;
+		case 'D':
+			model->AloneChangeObj(1, Transform::MOVE_R, 10.0);
+			break;
+		case 'Z':
+			model->AloneChangeObj(1, Transform::SCALE, 2);
+			break;
+		case 'X':
+			model->AloneChangeObj(1, Transform::SCALE, 0.5);
+			break;
+		case 'R':
+			model->AloneChangeObj(1, Transform::ROTATE_CW_X, 10.0);
+			break;
+		case 'T':
+			model->AloneChangeObj(1, Transform::ROTATE_ACW_X, 10.0);
+			break;
+		case 'F':
+			model->AloneChangeObj(1, Transform::ROTATE_CW_Y, 10.0);
+			break;
+		case 'G':
+			model->AloneChangeObj(1, Transform::ROTATE_ACW_Y, 10.0);
+			break;
+		case 'V':
+			model->AloneChangeObj(1, Transform::ROTATE_CW_Z, 10.0);
+			break;
+		case 'B':
+			model->AloneChangeObj(1, Transform::ROTATE_ACW_Z, 10.0);
+			break;
+		case '<':
+			model->AloneChange(Transform::MOVE_F, 10.0);
+			break;
+		case '>':
+			model->AloneChange(Transform::MOVE_B, 10.0);
+			break;
+		case '{':
+			model->AloneChange(Transform::SCALE, 2);
+			break;
+		case '}':
+			model->AloneChange(Transform::SCALE, 0.5);
+			break;
+		case 'i':
 			model->AloneChange(Transform::ROTATE_CW_X, 10.0);
 			break;
-		case 'u':
+		case 'o':
 			model->AloneChange(Transform::ROTATE_ACW_X, 10.0);
 			break;
-		case 'h':
+		case 'j':
 			model->AloneChange(Transform::ROTATE_CW_Y, 10.0);
 			break;
-		case 'j':
+		case 'k':
 			model->AloneChange(Transform::ROTATE_ACW_Y, 10.0);
 			break;
 		case 'n':
@@ -109,6 +181,23 @@ LRESULT CALLBACK Controller::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 			break;
 		case 'm':
 			model->AloneChange(Transform::ROTATE_ACW_Z, 10.0);
+			break;
+		}
+		break;
+	case WM_KEYUP:
+		switch (wParam)
+		{
+		case VK_LEFT:
+			model->AloneChange(Transform::MOVE_L, 10.0);
+			break;
+		case VK_RIGHT:
+			model->AloneChange(Transform::MOVE_R, 10.0);
+			break;
+		case VK_UP:
+			model->AloneChange(Transform::MOVE_U, 10.0);
+			break;
+		case VK_DOWN:
+			model->AloneChange(Transform::MOVE_D, 10.0);
 			break;
 		}
 		break;
